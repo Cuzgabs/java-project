@@ -17,5 +17,12 @@ class DoNewFile extends Command<HotelManager> {
   @Override
   protected final void execute() throws CommandException {
     //FIXME implement command
+
+    // Criar uma nova instância de um hotel vazio
+    _receiver.createNewHotel();
+    
+    // Confirma a criação da nova aplicação sem arquivo associado
+    _display.addLine("Nova aplicação criada. O estado não está associado a nenhum ficheiro.");
+    _display.display();
   }
 }
