@@ -12,6 +12,18 @@ import java.io.*;
 public class HotelManager {
   /** The current zoo hotel */ // Should we initialize this field?
   private Hotel _hotel = new Hotel();
+  /** The filename associated with the current state, or null if the application is anonymous */
+  private String _filename;
+
+
+/**
+  * Creates a new hotel (resets the state of the application) and removes any associated file.
+  */
+public void createNewHotel() {
+  _hotel = new Hotel();  // Cria um novo hotel vazio
+  _filename = null;      // Desassocia o estado de qualquer arquivo
+}
+
   
   /**
    * Saves the serialized application's state into the file associated to the current network.
@@ -22,8 +34,12 @@ public class HotelManager {
    **/
   public void save() throws FileNotFoundException, MissingFileAssociationException, IOException {
     // FIXME implement serialization method
+    if (_filename == null) {
+      throw new MissingFileAssociationException();
+    }
+  saveAs(_filename);
   }
-  
+
   /**
    * Saves the serialized application's state into the specified file. The current network is
    * associated to this file.
@@ -35,6 +51,10 @@ public class HotelManager {
    **/
   public void saveAs(String filename) throws FileNotFoundException, MissingFileAssociationException, IOException {
     // FIXME implement serialization method
+    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename))) {
+      oos.writeObject(_hotel);  // Serializa o estado do hotel
+      _filename = filename;     // Atualiza o nome do arquivo associado
+    }
   }
   
   /**
@@ -45,6 +65,12 @@ public class HotelManager {
    **/
   public void load(String filename) throws UnavailableFileException {
     // FIXME implement serialization method
+    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename))) {
+      _hotel = (Hotel) ois.readObject();  // Deserializa o estado do hotel
+      _filename = filename;               // Atualiza o nome do arquivo associado
+    } catch (IOException | ClassNotFoundException e) {
+      throw new UnavailableFileException(filename);
+    }
   }
   
   /**
@@ -70,5 +96,9 @@ public class HotelManager {
    **/
   public final Hotel getHotel() {
     return _hotel;
+  }
+
+  public String getFilename() {
+    return _filename;
   }
 }
